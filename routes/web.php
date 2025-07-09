@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/admin/subscriptions', [SubscriptionController::class, 'index'])->name('subscription.index');
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::resource('users', UserController::class);
+    Route::get('/admin/subscriptions/{id}/reminder', [SubscriptionController::class, 'sendReminder'])->name('subscriptions.reminder');
 });
 
 
@@ -41,7 +42,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 });
 
 
-Route::post('/webhook/stripe', [StripeWebhookController::class, 'handle']);
+// Route::post('/webhook/stripe', [StripeWebhookController::class, 'handle']);
 
 Route::get('/', [HostingController::class, 'index'])->name('hosting.plans');
 Route::post('/hosting/subscribe', [HostingController::class, 'subscribe'])->name('hosting.subscribe');

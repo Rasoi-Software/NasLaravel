@@ -3,6 +3,11 @@
 @section('content')
 <div class="container-fluid py-2">
     <div class="row">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
         <div class="col-12">
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
@@ -23,10 +28,15 @@
                                     <th class="text-center">Status</th>
                                     <th class="text-center">Starts At</th>
                                     <th class="text-center">Ends At</th>
+                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($subscriptions as $index => $sub)
+                                 @php
+                                     $remainingDays = now()->diffInDays(\Carbon\Carbon::parse($sub->ends_at), false); // false means can be negative
+
+                                @endphp
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>
@@ -52,6 +62,14 @@
                                         </td>
                                         <td class="text-center text-xs">{{ \Carbon\Carbon::parse($sub->starts_at)->format('d M, Y') }}</td>
                                         <td class="text-center text-xs">{{ \Carbon\Carbon::parse($sub->ends_at)->format('d M, Y') }}</td>
+                                        <td class="text-center text-xs">
+                                          @if($remainingDays <= 7)
+                                                <a href="{{ route('admin.subscriptions.reminder', $sub->id) }}" class="btn btn-success">Reminder</a>
+                                            @else
+                                                <span>{{ (int) $remainingDays }} days remaining</span>
+                                            @endif
+                                        </td>
+
                                     </tr>
                                 @empty
                                     <tr>
