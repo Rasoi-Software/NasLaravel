@@ -3,7 +3,15 @@
 
 Hello {{ $subscription->user->name }},
 
-Your subscription is expiring on **{{ \Carbon\Carbon::parse($subscription->ends_at)->format('d M Y H:i') }}**.
+@php
+    $endsAt = \Carbon\Carbon::parse($subscription->ends_at);
+@endphp
+
+@if($endsAt->isPast())
+Your subscription **has expired** on **{{ $endsAt->format('d M Y H:i') }}**.
+@else
+Your subscription is expiring on **{{ $endsAt->format('d M Y H:i') }}**.
+@endif
 
 Please renew before it expires.
 Thanks,<br>
