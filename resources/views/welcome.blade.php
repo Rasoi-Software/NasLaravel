@@ -4,6 +4,16 @@
 <div class="container my-5">
     <h2 class="text-center mb-4">Choose Your Hosting Plan</h2>
 
+     <div class="row justify-content-center mb-4">
+        <div class="col-md-4">
+            <label for="billing-cycle" class="form-label">Billing Cycle</label>
+            <select class="form-select" id="billing-cycle">
+                <option value="monthly" selected>Monthly</option>
+                <option value="yearly">Yearly</option>
+            </select>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
         @foreach ($stripeProducts as $product)
         <div class="col-md-4">

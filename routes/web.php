@@ -37,8 +37,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/user/dashboard', function () {
-        return view('user.dashboard');
+        return view('user.welcome');
     });
+});
+
+Route::prefix('users')->middleware(['auth'])->group(function () {
+    Route::get('/payments', [UserController::class, 'payments'])->name('users.payments');
+    Route::get('/subscriptions', [UserController::class, 'subscriptions'])->name('users.subscriptions');
+    Route::get('/payments/{payment}/invoice', [UserController::class, 'downloadInvoice']) ->name('users.payments.invoice');
 });
 
 

@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Models\Payment;
+use App\Models\Subscription;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -111,4 +114,27 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
+    
+    public function payments()
+    {
+        $payments = Payment::where('user_id', auth()->id())->get();
+        return view('users.payments', compact('payments'));
+    }
+
+    public function subscriptions()
+    {
+        $subscriptions = Subscription::where('user_id', auth()->id())->get();
+
+        return view('users.subscriptions', compact('subscriptions'));
+    }
+   public function downloadInvoice($id)
+  {
+    $payment = Payment::where('id', $id)
+                      ->where('user_id', auth()->id())
+                      ->firstOrFail();
+
+    $pdf = Pdf::loadView('users.invoice', compact('payment'));
+
+    return $pdf->download("invoice_{$payment->id}.pdf");
+  }
 }
