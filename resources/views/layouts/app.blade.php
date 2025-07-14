@@ -89,6 +89,21 @@ body {
 $(document).ready(function() {
     $('table').DataTable();
 });
+    function submitSubscribeForm() {
+        const name = document.getElementById('modal-name').value.trim();
+        const email = document.getElementById('modal-email').value.trim();
+
+        if (!name || !email) {
+            alert('Please fill in both name and email.');
+            return;
+        }
+
+        document.getElementById('input-name').value = name;
+        document.getElementById('input-email').value = email;
+
+        document.getElementById('subscribe-form').submit();
+    }
+
 </script>
 
 </body>
