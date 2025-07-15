@@ -31,6 +31,7 @@
     </p>
 
     <p>
-        — <strong>The Do It Digital Team</strong>
+        Sincerely,<br/>
+        The Do It Digital Team
     </p>
 </div>
