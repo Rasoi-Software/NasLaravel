@@ -168,6 +168,52 @@ class HostingController extends Controller
                 ]
             );
 
+            $isRenewal = false;
+
+            $existingSubscription = \App\Models\Subscription::where('user_id', $user->id)
+                ->where('ends_at', '>=', now()) // still active
+                ->first();
+
+            if ($existingSubscription) {
+                $isRenewal = true;
+            }
+
+            $priceId = $subscription->items->data[0]->price->id;
+
+            // Get the hosting plan
+            $hostingPlan = \App\Models\HostingPlan::where('stripe_price_id', $priceId)->first();
+
+            if (!$hostingPlan) {
+                \Log::error("HostingPlan not found for price_id: {$priceId}");
+                return redirect('/')->with('error', 'Hosting plan not found.');
+            }
+
+            // prepare email variables
+            $planName = $hostingPlan->name;
+            $description = $hostingPlan->description;
+            if ($hostingPlan->interval === 'yearly') {
+                $duration = '12-Month';
+            } elseif ($hostingPlan->interval === 'monthly') {
+                $duration = '1-Month';
+            } else {
+                $duration = ucfirst($hostingPlan->interval); // fallback
+            }
+
+            \Mail::send('emails.subscription', [
+                'customer_name' => $customer_name,
+                'renewal_date'  => now()->toFormattedDateString(),
+                'amount_paid'   => number_format($invoice->amount_paid / 100, 2) . ' ' . strtoupper($invoice->currency),
+                'card_last4'    => $session->payment_method_types[0] ?? '****',
+                'billing_url'   => url('/users/payments'),
+                'is_renewal'    => $isRenewal,
+                'plan_name'     => $planName,
+                'duration'      => $duration,
+                'description'   => $description,
+            ], function ($message) use ($customer_email, $isRenewal) {
+                $message->to($customer_email)
+                        ->subject($isRenewal ? 'Your Hosting Plan Has Been Renewed!' : 'Welcome! Your Hosting Plan is Active!');
+            });
+
 
 
             return view('success', compact('subscription'));
