@@ -9,32 +9,59 @@ use Stripe\Checkout\Session as StripeSession;
 use Stripe\Price;
 use Stripe\Product;
 use Stripe\Subscription as StripeSubscription;;
+
 use Carbon\Carbon;
 use Stripe\Invoice;
 use Stripe\PaymentIntent;
+use App\Models\HostingPlan;
 
 class HostingController extends Controller
 {
     public function index()
     {
+        $plans = HostingPlan::all();
+        return view('admin.hosting_plans.index', compact('plans'));
+    }
+    public function listforuser()
+    {
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        $prices = Price::all(['limit' => 10]);
+        $prices = Price::all(['limit' => 100]);
 
-        $stripeProducts = [];
+        $stripeProducts = [
+            'monthly' => [],
+            'yearly' => [],
+        ];
 
         foreach ($prices->data as $price) {
             $product = Product::retrieve($price->product);
+            $interval = $price->recurring->interval;
 
-            $stripeProducts[] = [
-                'name'     => $product->name,
-                'price_id' => $price->id,
-                'amount'   => $price->unit_amount,
-                'currency' => $price->currency,
-            ];
+            if (in_array($interval, ['month', 'year'])) {
+                HostingPlan::firstOrCreate(
+                    ['stripe_price_id' => $price->id], // match by this
+                    [
+                        'stripe_product_id' => $product->id,
+                        'name'        => $product->name,
+                        'description' => $product->description,
+                        'interval'    => $interval === 'month' ? 'monthly' : 'yearly',
+                        'amount'      => $price->unit_amount,
+                        'currency'    => $price->currency,
+                    ]
+                );
+            }
         }
 
-        return view('welcome', compact('stripeProducts'));
+
+        // Now fetch from DB instead of Stripe
+        $plans = HostingPlan::all()->groupBy('interval');
+
+        return view('welcome', [
+            'stripeProducts' => [
+                'monthly' => $plans['monthly'] ?? [],
+                'yearly'  => $plans['yearly'] ?? [],
+            ]
+        ]);
     }
 
     public function subscribe(Request $request)
@@ -83,7 +110,7 @@ class HostingController extends Controller
             // Retrieve the Subscription
             $subscription = StripeSubscription::retrieve($session->subscription);
             $stripeCustomerId = $subscription->customer;
-           // dd($subscription->items->data[0]->current_period_end);
+            // dd($subscription->items->data[0]->current_period_end);
             if (isset($subscription->items->data[0]->current_period_end)) {
                 $timestamp = $subscription->items->data[0]->current_period_end;
                 $current_period_end = Carbon::createFromTimestamp($timestamp);
@@ -150,5 +177,28 @@ class HostingController extends Controller
     public function cancel(Request $request)
     {
         return view('failed'); // optional
+    }
+
+    public function edit($id)
+    {
+        $plan = HostingPlan::findOrFail($id);
+        return view('admin.hosting_plans.edit', compact('plan'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $plan = HostingPlan::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required',
+            'description' => 'nullable|string',
+        ]);
+
+        $plan->update([
+            'name' => $request->name,
+            'description' => $request->description,
+        ]);
+
+        return redirect()->route('admin.hosting_plans.index')->with('success', 'Hosting Plan updated successfully.');
     }
 }

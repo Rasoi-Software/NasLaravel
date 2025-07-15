@@ -41,6 +41,13 @@
           <span class="nav-link-text ms-1">Manage Subscription</span>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link {{ request()->routeIs('admin.hosting_plans.*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}"
+          href="{{ route('admin.hosting_plans.index') }}">
+          <i class="material-symbols-rounded opacity-5">table_view</i>
+          <span class="nav-link-text ms-1">Manage Hostings</span>
+        </a>
+      </li>
     </ul>
 
   </div>

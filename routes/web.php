@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/admin/subscriptions', [SubscriptionController::class, 'index'])->name('subscription.index');
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::resource('users', UserController::class);
+    Route::resource('hosting_plans', HostingController::class);
     Route::get('/admin/subscriptions/{id}/reminder', [SubscriptionController::class, 'sendReminder'])->name('subscriptions.reminder');
 });
 
@@ -44,13 +45,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 Route::prefix('users')->middleware(['auth'])->group(function () {
     Route::get('/payments', [UserController::class, 'payments'])->name('users.payments');
     Route::get('/subscriptions', [UserController::class, 'subscriptions'])->name('users.subscriptions');
-    Route::get('/payments/{payment}/invoice', [UserController::class, 'downloadInvoice']) ->name('users.payments.invoice');
+    Route::get('/payments/{payment}/invoice', [UserController::class, 'downloadInvoice'])->name('users.payments.invoice');
 });
 
 
 // Route::post('/webhook/stripe', [StripeWebhookController::class, 'handle']);
 
-Route::get('/', [HostingController::class, 'index'])->name('hosting.plans');
+Route::get('/', [HostingController::class, 'listforuser'])->name('hosting.plans');
 Route::post('/hosting/subscribe', [HostingController::class, 'subscribe'])->name('hosting.subscribe');
 Route::get('/checkout/success', [HostingController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/cancel', [HostingController::class, 'cancel'])->name('checkout.cancel');
