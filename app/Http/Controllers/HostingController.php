@@ -64,30 +64,34 @@ class HostingController extends Controller
         ]);
     }
 
+
+
     public function subscribe(Request $request)
     {
-        //$user = auth()->user();
-
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        $checkoutSession = StripeSession::create([
+        $plan = HostingPlan::where('stripe_price_id', $request->price_id)->firstOrFail();
+
+        $checkoutSession = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
             'customer_email' => $request->email,
             'line_items' => [[
-                'price'    => $request->price_id,
+                'price' => $plan->stripe_price_id,
                 'quantity' => 1,
             ]],
             'mode' => 'subscription',
             'success_url' => route('checkout.success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url'  => route('checkout.cancel'),
             'metadata' => [
-                'user_id' => $request->email,
-                'user_name' => $request->name,
+                'guest_email' => $request->email,
+                'guest_name'  => $request->name,
             ],
         ]);
 
         return redirect($checkoutSession->url);
     }
+
+
 
     public function success(Request $request)
     {

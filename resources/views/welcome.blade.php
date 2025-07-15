@@ -29,13 +29,11 @@
                             <h5 class="fw-bold">{{ $product['name'] }}</h5>
                             <h3 class="my-3">${{ number_format($product['amount'] / 100, 2) }} <small class="text-muted fs-6">/year</small></h3>
                             <p class=""> {!! Str::limit(nl2br(e($product->description)), 60) !!}</p>
-                            
-                            <form id="subscribe-form" action="{{ route('hosting.subscribe') }}" method="POST">
+
+                           <form action="{{ route('hosting.subscribe') }}" method="POST">
                                 @csrf
-                                <input type="hidden" name="price_id" value="{{ $product['price_id'] }}">
-                                <input type="hidden" name="name" id="input-name">
-                                <input type="hidden" name="email" id="input-email">
-                                <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#userInfoModal">
+                                <input type="hidden" name="price_id" value="{{ $product['stripe_price_id'] }}">
+                                <button type="submit" class="btn btn-primary w-100">
                                     Subscribe
                                 </button>
                             </form>
@@ -57,15 +55,14 @@
                             <h3 class="my-3">${{ number_format($product['amount'] / 100, 2) }} <small class="text-muted fs-6">/year</small></h3>
                             <p class=""> {!! Str::limit(nl2br(e($product->description)), 60) !!}</p>
 
-                            <form id="subscribe-form" action="{{ route('hosting.subscribe') }}" method="POST">
+                            <form action="{{ route('hosting.subscribe') }}" method="POST">
                                 @csrf
-                                <input type="hidden" name="price_id" value="{{ $product['price_id'] }}">
-                                <input type="hidden" name="name" id="input-name">
-                                <input type="hidden" name="email" id="input-email">
-                                <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#userInfoModal">
+                                <input type="hidden" name="price_id" value="{{ $product['stripe_price_id'] }}">
+                                <button type="submit" class="btn btn-primary w-100">
                                     Subscribe
                                 </button>
                             </form>
+
                         </div>
                     </div>
                 </div>
@@ -74,32 +71,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="userInfoModal" tabindex="-1" aria-labelledby="userInfoModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="userInfoModalLabel">Enter Your Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="modal-name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="modal-name" placeholder="Enter your name">
-                    </div>
-                    <div class="mb-3">
-                        <label for="modal-email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="modal-email" placeholder="Enter your email">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="submitSubscribeForm()">Proceed</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    
 
 <script>
     function submitSubscribeForm() {
