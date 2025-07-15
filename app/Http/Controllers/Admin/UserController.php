@@ -117,7 +117,9 @@ class UserController extends Controller
     
     public function payments()
     {
-        $payments = Payment::where('user_id', auth()->id())->get();
+        $payments = Payment::where('user_id', auth()->id())
+                   ->orderBy('id', 'desc')
+                   ->get();
         return view('users.payments', compact('payments'));
     }
 

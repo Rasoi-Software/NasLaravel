@@ -87,7 +87,9 @@ body {
 
 <script>
 $(document).ready(function() {
-    $('table').DataTable();
+    $('table').DataTable({
+        order: [[0, 'desc']] // 👈 first column (index 0) in descending order
+    });
 });
     function submitSubscribeForm() {
         const name = document.getElementById('modal-name').value.trim();
