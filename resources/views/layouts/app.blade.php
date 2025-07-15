@@ -22,9 +22,10 @@ body {
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
 <div class="container">
-    <a class="navbar-brand" href="{{ url('/') }}">
-        {{ config('app.name', 'MyApp') }}
-    </a>
+   <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+    <img src="{{ asset('assets/img/doitlogo.png') }}" alt="MyApp Logo"
+         style="height:50px; width:auto; margin-right:8px; filter:drop-shadow(0 0 2px #fff);">
+</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
         data-bs-target="#navbarContent" aria-controls="navbarContent"
         aria-expanded="false" aria-label="Toggle navigation">
